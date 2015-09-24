@@ -11,18 +11,26 @@ module.exports.s3 = s3;
  * @param {Object} options
  * @param {String} options.bucket S3 bucket to cleanup
  * @param {Date} options.before Oldest date of MPUs to leave untouched. Defaults to the current time - 24 hours
+ * @param {Function} options.logger Optional function to call after each abort operation for logging
  * @param {Function} callback Callback function
  */
 function cleanup(options, callback) {
     options.before = options.before || new Date(+new Date() - 864e5);
+    options.logger = options.logger || function() {};
     listAll(options, function(err, uploads) {
         if (err) return callback(err);
         var q = queue(4);
         var aborted = [];
         uploads.forEach(function(upload) {
             if (upload.Initiated > options.before) return;
-            aborted.push('s3://' + options.bucket + '/' + upload.Key + '@' + upload.UploadId);
-            q.defer(s3.abortMultipartUpload.bind(s3), {
+            q.defer(function(params, callback) {
+                s3.abortMultipartUpload(params, function(err) {
+                    if (err) return callback(err);
+                    aborted.push('s3://' + options.bucket + '/' + upload.Key + '@' + upload.UploadId);
+                    options.logger('s3://' + options.bucket + '/' + upload.Key + '@' + upload.UploadId);
+                    callback();
+                });
+            }, {
                 Bucket: options.bucket,
                 UploadId: upload.UploadId,
                 Key: upload.Key

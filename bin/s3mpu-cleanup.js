@@ -12,11 +12,9 @@ var bucket = args[0].replace(/^s3:\/\//,'');
 var before = args[1] ? parseInt(args[1], 10) : undefined;
 s3mpuCleanup({
     bucket: bucket,
-    before: before ? new Date(+new Date - before*1000) : undefined
+    before: before ? new Date(+new Date - before*1000) : undefined,
+    logger: function(item) { console.log('aborted %s', item); }
 }, function(err, aborted) {
     if (err) throw err;
-    aborted.forEach(function(item) {
-        console.log('aborted %s', item);
-    });
 });
 

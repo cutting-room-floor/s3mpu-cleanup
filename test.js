@@ -24,6 +24,25 @@ tape('cleanup (defaults)', function(assert) {
     });
 });
 
+tape('cleanup (logger)', function(assert) {
+    var logged = [];
+    s3mpuCleanup({
+        bucket:'test-bucket',
+        logger: function(entry) {
+            logged.push(entry);
+        }
+    }, function(err, aborted) {
+        assert.ifError(err);
+        assert.deepEqual(aborted, [
+            's3://test-bucket/a.json@id.1'
+        ], 'aborts expired a.json@id.1');
+        assert.deepEqual(logged, [
+            's3://test-bucket/a.json@id.1'
+        ], 'calls logger function');
+        assert.end();
+    });
+});
+
 tape('cleanup (before=10min ago)', function(assert) {
     s3mpuCleanup({bucket:'test-bucket', before: new Date(+new Date - 60e3)}, function(err, aborted) {
         assert.ifError(err);
