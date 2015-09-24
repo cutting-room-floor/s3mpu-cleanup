@@ -1,0 +1,21 @@
+{
+  "name": "s3mpu-cleanup",
+  "version": "0.0.0",
+  "description": "Cleanup stale multipart uploads from an S3 bucket",
+  "author": "Mapbox",
+  "license": "ISC",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test.js"
+  },
+  "bin": {
+    "s3mpu-cleanup": "bin/s3mpu-cleanup.js"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1.40",
+    "queue-async": "^1.0.7"
+  },
+  "devDependencies": {
+    "tape": "^4.0.1"
+  }
+}
