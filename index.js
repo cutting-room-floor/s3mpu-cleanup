@@ -60,7 +60,7 @@ function listAll(options, callback) {
         s3.listMultipartUploads(params, function(err, data) {
             if (err) return callback(err);
             uploads = uploads.concat(data.Uploads);
-            if (data.IsTruncated) return ls({
+            if (data.IsTruncated && data.Uploads.length) return ls({
                 KeyMarker: data.Uploads[data.Uploads.length-1].Key,
                 UploadIdMarker: data.Uploads[data.Uploads.length-1].UploadId
             });
